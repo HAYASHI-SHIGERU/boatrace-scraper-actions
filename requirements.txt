@@ -1,5 +1,7 @@
-requests
-beautifulsoup4
-pandas
-gspread
-oauth2client
+requests==2.31.0
+beautifulsoup4==4.12.2
+pandas==2.1.4
+SQLAlchemy==2.0.25
+gspread==5.12.4
+oauth2client==4.1.3
+lxml==5.1.0
