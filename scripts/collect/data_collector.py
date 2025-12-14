@@ -16,6 +16,16 @@ except ImportError:
     from scripts.utils.google_sheets import GoogleSheetsClient
 
 class BoatRaceScraper:
+    # レース場コードと名前のマッピング
+    STADIUM_NAMES = {
+        '01': '桐生', '02': '戸田', '03': '江戸川', '04': '平和島',
+        '05': '多摩川', '06': '浜名湖', '07': '蒲郡', '08': '常滑',
+        '09': '津', '10': '三国', '11': 'びわこ', '12': '住之江',
+        '13': '尼崎', '14': '鳴門', '15': '丸亀', '16': '児島',
+        '17': '宮島', '18': '徳山', '19': '下関', '20': '若松',
+        '21': '芦屋', '22': '福岡', '23': '唐津', '24': '大村'
+    }
+    
     def __init__(self, date_str, to_sheet=False):
         self.date_str = date_str
         self.to_sheet = to_sheet
@@ -100,6 +110,7 @@ class BoatRaceScraper:
                                 results.append({
                                     'date': self.date_str,
                                     'stadium_code': jcd,
+                                    'stadium_name': self.STADIUM_NAMES.get(jcd, '不明'),
                                     'race_no': rno,
                                     'rank': int(rank_str),
                                     'boat_no': int(str(boat_val).strip()),
@@ -120,6 +131,7 @@ class BoatRaceScraper:
                                 payouts.append({
                                     'date': self.date_str,
                                     'stadium_code': jcd,
+                                    'stadium_name': self.STADIUM_NAMES.get(jcd, '不明'),
                                     'race_no': rno,
                                     'bet_type': bet_type,
                                     'combination': combination,
