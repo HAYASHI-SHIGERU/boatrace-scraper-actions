@@ -1,0 +1,37 @@
+name: Scrape Boatrace Data to Sheet
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_date:
+        description: 'Target Date (YYYYMMDD)'
+        required: false
+
+jobs:
+  scrape-and-save:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run Collector
+        env:
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+          SPREADSHEET_ID: ${{ secrets.SPREADSHEET_ID }}
+        run: |
+          TARGET_DATE=${{ inputs.target_date }}
+          if [ -z "$TARGET_DATE" ]; then
+            TARGET_DATE=$(date +%Y%m%d)
+            echo "No date provided, using today: $TARGET_DATE"
+          fi
+          
+          echo "Running data_collector.py for $TARGET_DATE..."
+          python scripts/collect/data_collector.py --date $TARGET_DATE --to-sheet
+          
+          echo "Running odds_collector.py for $TARGET_DATE..."
+          python scripts/collect/odds_collector.py --date $TARGET_DATE --to-sheet
