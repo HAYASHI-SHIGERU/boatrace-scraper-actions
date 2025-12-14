@@ -8,7 +8,7 @@ class GoogleSheetsClient:
     def __init__(self):
         self.scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
         self.creds = self._get_credentials()
-        self.client = gspread.authorize(self.creds)
+        self.client = None  # Lazy initialization
         self.spreadsheet_id = os.environ.get('SPREADSHEET_ID')
         if not self.spreadsheet_id:
             raise ValueError("Environment variable SPREADSHEET_ID is not set")
@@ -36,9 +36,16 @@ class GoogleSheetsClient:
         If append is True, it appends to the existing sheet.
         If the sheet doesn't exist, it creates it.
         """
-        # Lazy initialization: connect to spreadsheet only when needed
+        # Lazy initialization: authorize and connect only when needed
+        if self.client is None:
+            print("Authorizing Google Sheets client...")
+            self.client = gspread.authorize(self.creds)
+            print("Authorization successful.")
+        
         if self.sheet is None:
+            print(f"Opening spreadsheet: {self.spreadsheet_id}")
             self.sheet = self.client.open_by_key(self.spreadsheet_id)
+            print("Spreadsheet opened successfully.")
         
         try:
             worksheet = self.sheet.worksheet(worksheet_name)
