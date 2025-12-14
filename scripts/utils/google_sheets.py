@@ -12,7 +12,7 @@ class GoogleSheetsClient:
         self.spreadsheet_id = os.environ.get('SPREADSHEET_ID')
         if not self.spreadsheet_id:
             raise ValueError("Environment variable SPREADSHEET_ID is not set")
-        self.sheet = self.client.open_by_key(self.spreadsheet_id)
+        self.sheet = None  # Lazy initialization
 
     def _get_credentials(self):
         # Prefer environment variable containing the JSON string
@@ -36,6 +36,10 @@ class GoogleSheetsClient:
         If append is True, it appends to the existing sheet.
         If the sheet doesn't exist, it creates it.
         """
+        # Lazy initialization: connect to spreadsheet only when needed
+        if self.sheet is None:
+            self.sheet = self.client.open_by_key(self.spreadsheet_id)
+        
         try:
             worksheet = self.sheet.worksheet(worksheet_name)
         except gspread.WorksheetNotFound:
